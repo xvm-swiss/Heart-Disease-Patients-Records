@@ -106,9 +106,6 @@ data = apply_1_hot_encoding(data, df)
 # Erzwinge die exakte Spaltenreihenfolge vom Training
 data = data[model.feature_names_in_] 
 
-# Sicherstellen, dass die Spaltenreihenfolge exakt wie im Training ist
-prediction = model.predict(data)
-
 
 # 6.1 Die rohe Vorhersage
 raw_val = model.predict(data)[0]
@@ -126,7 +123,13 @@ st.markdown(f"<h2 style='color:{color}'>{result_text} (Value: {raw_val:.3f})</h2
 
 # 7. Vorhersage & Grafik
 prediction = model.predict(data)
-score = float(prediction) # Wandelt z.B. [0.473] in 0.473 um
+
+# Wir nehmen sicherheitshalber das erste Element [0] und wandeln es dann um
+try:
+    score = float(np.array(prediction).flatten()[0])
+except (TypeError, ValueError, IndexError):
+    score = 0.0  # Fallback, falls etwas ganz schief geht
+
 
 # Das Diagramm erstellen
 fig = go.Figure(go.Indicator(
